@@ -11,4 +11,5 @@ update database by using below command
 
 Add SQL Server name in appsettings.json folder
 
-"Data Source=Add SQL Server name; Initial Catalog=APILogicTaskDB;MultipleActiveResultSets=True; Integrated Security=True;"
+ "ConnectionString": {
+        "TaskConStr": "Data Source=Add SQL Server name; Initial Catalog=APILogicTaskDB;MultipleActiveResultSets=True; Integrated Security=True;"}
