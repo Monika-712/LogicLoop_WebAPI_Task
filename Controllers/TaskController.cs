@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using LogicLoopTask.Repository;
-using LogicLoopTask.Converter;
 
 namespace LogicLoopTask.Controllers
 {
@@ -13,10 +10,14 @@ namespace LogicLoopTask.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         readonly ITaskRepository _taskRepository = null;
-        public TaskController(ITaskRepository taskRepository)
+
+        public TaskController(ITaskRepository taskRepository, IHttpContextAccessor httpContextAccessor)
         {
             this._taskRepository = taskRepository;
+            this._httpContextAccessor = httpContextAccessor;
         }
         [HttpGet]
         public ActionResult GetList()
@@ -26,13 +27,16 @@ namespace LogicLoopTask.Controllers
                 var data = _taskRepository.GetTaskList().ToList();
                 if (data == null) return NotFound();
                 return Ok(data);
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                string currentUrl = _httpContextAccessor.HttpContext.Request.Host.Value + _httpContextAccessor.HttpContext.Request.Path.Value + "/GetList";
+
+                ExceptionLogging.Logs(ex, currentUrl);
 
                 return BadRequest();
             }
-
         }
         [HttpGet]
         [Route("{id}")]
@@ -40,11 +44,15 @@ namespace LogicLoopTask.Controllers
         {
             try
             {
+                int i = int.Parse("ABV");
                 var data = _taskRepository.GetTaskList().Where(x => x.id == id).FirstOrDefault();
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                string currentUrl = _httpContextAccessor.HttpContext.Request.Host.Value + _httpContextAccessor.HttpContext.Request.Path.Value + "/Get/" + id;
+
+                ExceptionLogging.Logs(ex, currentUrl);
 
                 return BadRequest();
             }
@@ -58,15 +66,18 @@ namespace LogicLoopTask.Controllers
                 var data = _taskRepository.AddTaskList(model);
                 return Ok(data);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                string currentUrl = _httpContextAccessor.HttpContext.Request.Host.Value + _httpContextAccessor.HttpContext.Request.Path.Value + "/Post";
+
+                ExceptionLogging.Logs(ex, currentUrl);
 
                 return BadRequest();
             }
 
         }
         [HttpPut]
-        public ActionResult UpdateTask(Models.Task model)
+        public ActionResult Put(Models.Task model)
         {
             try
             {
@@ -78,7 +89,11 @@ namespace LogicLoopTask.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                string currentUrl = _httpContextAccessor.HttpContext.Request.Host.Value + _httpContextAccessor.HttpContext.Request.Path.Value + "/Put";
+
+                ExceptionLogging.Logs(ex, currentUrl);
+
+                return BadRequest();
             }
             return NotFound();
         }
@@ -87,7 +102,7 @@ namespace LogicLoopTask.Controllers
         {
             try
             {
-                if (id>0)
+                if (id > 0)
                 {
                     string data = _taskRepository.Delete(id);
                     return Ok(data);
@@ -95,29 +110,13 @@ namespace LogicLoopTask.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                string currentUrl = _httpContextAccessor.HttpContext.Request.Host.Value + _httpContextAccessor.HttpContext.Request.Path.Value + "/Delete/ " + id;
+
+                ExceptionLogging.Logs(ex, currentUrl);
+
+                return BadRequest();
             }
             return NotFound();
-        }
-
-
-
-
-        [HttpGet]
-        [Route("{from}/{amount}/{to}")]
-        public ActionResult Get(string from, string amount, string to)
-        {
-            try
-            {
-                var data = CurrencyConverter.Converter(amount, from, to);
-                if (data == null) return NotFound();
-                return Ok(data);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
         }
     }
 }

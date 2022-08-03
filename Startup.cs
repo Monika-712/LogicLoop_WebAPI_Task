@@ -6,6 +6,7 @@ using LogicLoopTask.Models;
 using LogicLoopTask.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,7 @@ namespace LogicLoopTask
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<TaskContext>(opts => opts.UseSqlServer(Configuration["ConnectionString:TaskConStr"]));
             services.AddScoped<ITaskRepository,TaskRepository>();//register dependency
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

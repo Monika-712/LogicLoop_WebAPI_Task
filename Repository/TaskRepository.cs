@@ -6,7 +6,7 @@ using LogicLoopTask.Models;
 
 namespace LogicLoopTask.Repository
 {
-    public class TaskRepository:ITaskRepository
+    public class TaskRepository : ITaskRepository
     {
         readonly TaskContext _taskContext = null;
         public TaskRepository(TaskContext context)
@@ -15,14 +15,14 @@ namespace LogicLoopTask.Repository
         }
         public IEnumerable<Task> GetTaskList()
         {
-           return _taskContext.tasks.ToList();
+            return _taskContext.tasks.ToList();
         }
 
         public bool AddTaskList(Task model)
         {
-             _taskContext.tasks.Add(model);
-           int result = _taskContext.SaveChanges();
-            if(result > 0)
+            _taskContext.tasks.Add(model);
+            int result = _taskContext.SaveChanges();
+            if (result > 0)
             {
                 return true;
             }
@@ -30,9 +30,9 @@ namespace LogicLoopTask.Repository
         }
         public string UpdateTask(Task task)
         {
-             _taskContext.tasks.Update(task);
+            _taskContext.tasks.Update(task);
             int result = _taskContext.SaveChanges();
-           if(result > 0)
+            if (result > 0)
             {
                 return "Task details updated.";
             }
